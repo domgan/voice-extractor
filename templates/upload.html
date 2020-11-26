@@ -1,0 +1,25 @@
+<form action="/upload/"
+      method="post"
+      enctype="multipart/form-data"
+      class="dropzone"
+      id="dropzone">
+  {% csrf_token %}
+  <div class="fallback">
+    <input name="noisy_train" type="file"/>
+    <input name="clear_train" type="file"/>
+    <input name="noisy_file" type="file"/>
+    <input type="submit"/>
+  </div>
+</form>
+
+{% if content %}
+<table>
+{% for row in content %}
+  <tr>
+  {% for col in row %}
+    <td>{{ col }}</td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+{% endif %}
