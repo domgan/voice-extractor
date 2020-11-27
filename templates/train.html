@@ -10,6 +10,11 @@
     <input type="submit" href="{% url 'filter' %}"/>
   </div>
 </form>
+<a href = "{% url 'filter' %}"> Filter </a>
+
+{% autoescape off %}
+{{ loss }}
+{% endautoescape %}
 
 {% if content %}
 <table>

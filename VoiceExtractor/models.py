@@ -3,7 +3,8 @@ from scipy.signal import resample
 import librosa
 import numpy as np
 from scipy import signal
-from matplotlib import pyplot as plt
+import plotly.graph_objects as go
+from plotly.offline import plot
 from tensorflow import keras, config
 from tensorflow.keras import layers, regularizers, Model, metrics, losses, Sequential
 import os
@@ -239,20 +240,29 @@ class VoiceExtractor:
         wavfile.write(output_path, self.fs, invert)
 
     def graphs(self):
-        plt.plot(self.history.history['loss'])
-        plt.plot(self.history.history['val_loss'])
-        plt.title('model loss')
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'val'], loc='upper left')
-        plt.grid()
-        plt.show()
+        loss = self.history.history['loss']
+        val_loss = self.history.history['val_loss']
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=loss,
+                            mode='lines+markers',
+                            name='train loss'))
+        fig.add_trace(go.Scatter(y=val_loss,
+                            mode='lines+markers',
+                            name='validation loss'))
+        temp_plot = plot(fig, output_type='div')
+        return temp_plot
+        #plt.title('model loss')
+        #plt.ylabel('loss')
+        #plt.xlabel('epoch')
+        #plt.legend(['train', 'val'], loc='upper left')
+        #plt.grid()
+        #plt.show()
 
-        plt.plot(self.history.history['accuracy'])
-        plt.plot(self.history.history['val_accuracy'])
-        plt.title('model accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'val'], loc='upper left')
-        plt.grid()
-        plt.show()
+        #plt.plot(self.history.history['accuracy'])
+        #plt.plot(self.history.history['val_accuracy'])
+        #plt.title('model accuracy')
+        #plt.ylabel('accuracy')
+        #plt.xlabel('epoch')
+        #lt.legend(['train', 'val'], loc='upper left')
+        #plt.grid()
+        #plt.show()

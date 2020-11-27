@@ -2,7 +2,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .forms import UploadFileForm
 
-from io import BytesIO
 import numpy as np
 import scipy.io.wavfile as wavfile
 from .models import VoiceExtractor
@@ -13,17 +12,21 @@ import tempfile
 
 def upload(request):
     content=[]
+    figures=[]
     if request.method == 'POST':
         noisy_train = request.FILES['noisy_train'].file
         clear_train = request.FILES['clear_train'].file
-        model_weights = create_model(noisy_train, clear_train)
+        model_weights, figures = create_model(noisy_train, clear_train)
         model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
-        return redirect('/filter/')
-    return render(request, 'train.html', {'content':content})
+        #return redirect('/filter/')
+    return render(request, 'train.html', {'content':content, 'loss':figures})
 
 
 def filter(request):
+    file_path = 'files/output.wav'
+    if os.path.exists(file_path):
+        os.remove(file_path)
     content=[]
     if request.method == 'POST':
         noisy_file = request.FILES['noisy_file'].file
@@ -37,9 +40,10 @@ def create_model(noisy_train, clear_train):
     voice_extractor.load_data(noisy_train, clear_train)
     voice_extractor.create_model()
     voice_extractor.compile_model(1e-2)
-    voice_extractor.fit_model(steps=665, epochs=10, validation_split=0.05)  # 1330
+    voice_extractor.fit_model(steps=1330, epochs=8, validation_split=0.05)  # 1330
+    figures = voice_extractor.graphs()
     model_weights = voice_extractor.model.get_weights()
-    return model_weights
+    return model_weights, figures
 
 
 def filter_file(noisy_file, model_weights, request):
