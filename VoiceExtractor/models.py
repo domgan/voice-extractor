@@ -215,11 +215,11 @@ class VoiceExtractor:
                                         batch_size=batch_size, validation_split=validation_split)
 
     def save_model(self, path):
-        self.model.save_model(path)
+        self.model.save_weights(path)
         print("Saved model to disk")
 
     def load_model(self, path):
-        self.model = keras.models.load_model(path)
+        self.model = keras.models.load_weights(path)
         print("Loaded model from disk")
 
     def filter_file(self, input_path, output_path, input_bits=16):
@@ -237,18 +237,6 @@ class VoiceExtractor:
 
         invert = librosa.istft(stft3, win_length=self.win_len, hop_length=self.overlap, window=self.window, center=True)
         wavfile.write(output_path, self.fs, invert)
-
-    def create_model2(self):
-        baseModel = MobileNetV2(weights=None, include_top=False, input_tensor=layers.Input(shape=(self.num_features, self.num_segments, 1)))
-
-        headModel = baseModel.output
-        headModel = layers.AveragePooling2D(pool_size=(1, 1))(headModel)
-        headModel = layers.Flatten(name="flatten")(headModel)
-        headModel = layers.Dense(128*2, activation="relu")(headModel)
-        headModel = layers.Dropout(0.5)(headModel)
-        headModel = layers.Dense(self.num_features, activation="sigmoid")(headModel)
-
-        self.model = Model(inputs=baseModel.input, outputs=headModel)
 
     def graphs(self):
         plt.plot(self.history.history['loss'])

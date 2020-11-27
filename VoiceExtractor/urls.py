@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .views import upload
+from .views import upload, filter, output
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('upload/', upload, name='upload')
+    path('upload/', upload, name='upload'),
+    path('filter/', filter, name='filter'),
+    path('output/', output, name='output')
 ]

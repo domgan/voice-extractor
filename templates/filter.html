@@ -1,0 +1,26 @@
+{% load static %}
+<form action="/filter/"
+      method="post"
+      enctype="multipart/form-data"
+      class="dropzone"
+      id="dropzone">
+  {% csrf_token %}
+  <div class="fallback">
+    <input name="noisy_file" type="file"/>
+    <input type="submit"/>
+  </div>
+</form>
+
+<a href = "/output/" download> Download </a>
+
+{% if content %}
+<table>
+{% for row in content %}
+  <tr>
+  {% for col in row %}
+    <td>{{ col }}</td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+{% endif %}
