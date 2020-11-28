@@ -271,8 +271,8 @@ class Plot:
         return 'Formatted plot: ' + self.title
 
     def create(self):
-        layout = Layout(paper_bgcolor='rgba(55,55,55,.1)', plot_bgcolor='rgba(36,36,36,.70)', yaxis=dict(range=self.ylim))
-        data = Scatter(x=self.x, y=self.y, name="Wykres", opacity=0.5, mode='lines+markers')
+        layout = Layout(paper_bgcolor='rgba(55,55,55,.4)', plot_bgcolor='rgba(36,36,36,.70)', yaxis=dict(range=self.ylim))
+        data = Scatter(x=self.x, y=self.y, name="Wykres", opacity=0.1, mode='lines+markers')
         fig = Figure(data=data, layout=layout)
         fig.update_layout(
             title=self.title,

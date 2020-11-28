@@ -1,16 +1,141 @@
 {% load static %}
-<!doctype html>
+
+<!DOCTYPE HTML>
+
 <html lang="en">
 <head>
-    <title>Extract your voice!</title>
+    <title>VoiceExtractor</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}"/>
+    <noscript>
+        <link rel="stylesheet" href="{% static 'assets/css/noscript.css' %}"/>
+    </noscript>
 </head>
-<body>
-<div id="maintext"
-     style="position:absolute; margin:auto; width:1000px; height:500px; text-align:center; top:0; bottom: 0; left: 0; right: 0;">
-    <h1 class="text-light mb-2"> Prepare files for traning! </h1>
-    <h4 class="text-light mb-5">(In .wav format and 16 or 32 bit)</h4>
-    <a href="{% url 'upload' %}"> Upload </a>
+<body class="is-preload">
+
+<!-- Sidebar -->
+<section id="sidebar">
+    <div class="inner">
+        <nav>
+            <ul>
+                <li><a href="#start">Start</a></li>
+                <li><a href="#train">Create Model</a></li>
+                <li><a href="#filter">Filter File</a></li>
+            </ul>
+        </nav>
+    </div>
+</section>
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Intro -->
+    <section id="start" class="wrapper style1 fullscreen fade-up">
+        <div class="inner">
+            <h1> Prepare files for traning! </h1>
+            <h4>(In .wav format and 16 or 32 bit)</h4>
+            <ul><li><a href="#train" class="button">Upload</a></li></ul>
+        </div>
+    </section>
+
+    <!-- One -->
+    <section id="train" class="wrapper style2 spotlights">
+        <div class="content">
+            <div class="inner">
+                <h2>System nadążny do paneli solarnych</h2>
+                <p>Polepszenie wydajności twojej instalacji fotowoltaicznej. Urządzenia ustawia się w takiej
+                    pozycji, która w danej chwili zagwarantuje odpowiednie ułożenie paneli względem Słońca.</p>
+                <ul class="actions">
+                    <li><a href="#filter" class="button">Dowiedz się więcej</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three -->
+    <section id="filter" class="wrapper style1 fade-up">
+        <div class="inner">
+            <h2>Skontaktuj się z nami</h2>
+            <p>Wypełnij formularz. Odpowiemy najszybciej jak się da.</p>
+            <div class="split style1">
+                <section>
+                    <form method="post" action="#">
+                        <div class="fields">
+                            <div class="field half">
+                                <label for="name">Imię</label>
+                                <input type="text" name="name" id="name"/>
+                            </div>
+                            <div class="field half">
+                                <label for="email">E-mail</label>
+                                <input type="text" name="email" id="email"/>
+                            </div>
+                            <div class="field">
+                                <label for="message">Wiadomość</label>
+                                <textarea name="message" id="message" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <ul class="actions">
+                            <li><a href="" class="button submit">Wyślij</a></li>
+                        </ul>
+                    </form>
+                </section>
+                <section>
+                    <ul class="contact">
+                        <li>
+                            <h3>Adres</h3>
+                            <span>ul. Czarnowiejska 21/37<br/>
+											Kraków, 30-000<br/>
+											Polska</span>
+                        </li>
+                        <li>
+                            <h3>E-mail</h3>
+                            <a href="#">eco@motion.info</a>
+                        </li>
+                        <li>
+                            <h3>Telefon</h3>
+                            <span>+48 975 362 187</span>
+                        </li>
+                        <li>
+                            <h3>Sociale</h3>
+                            <ul class="icons">
+                                <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a>
+                                </li>
+                                <li><a href="#" class="icon brands fa-facebook-f"><span
+                                        class="label">Facebook</span></a></li>
+                                <li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                                <li><a href="#" class="icon brands fa-instagram"><span
+                                        class="label">Instagram</span></a></li>
+                                <li><a href="#" class="icon brands fa-linkedin-in"><span
+                                        class="label">LinkedIn</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </section>
+
 </div>
+
+<!-- Footer -->
+<footer id="footer" class="wrapper style1-alt">
+    <div class="inner">
+        <ul class="menu">
+            <li>&copy; EcoMotion. Żadne prawa nie są zastrzeżone.</li>
+            <li>Projekt: <a href="https://github.com/domgan">Dominik</a></li>
+        </ul>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery.scrollex.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery.scrolly.min.js' %}"></script>
+<script src="{% static 'assets/js/browser.min.js' %}"></script>
+<script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
+<script src="{% static 'assets/js/util.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
+
 </body>
 </html>
