@@ -4,12 +4,13 @@ import librosa
 import numpy as np
 from scipy import signal
 import plotly.graph_objects as go
+from plotly.graph_objects import Layout, Scatter, Figure
 from plotly.offline import plot
 from tensorflow import keras, config
 from tensorflow.keras import layers, regularizers, Model, metrics, losses, Sequential
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-from tensorflow.keras.applications import MobileNetV2
+
 
 class VoiceExtractor:
     def __init__(self, fs=16e3, win_len=256, num_segments=8*2, bits=16):
@@ -105,7 +106,6 @@ class VoiceExtractor:
         stftSegments = np.moveaxis(stft_segments, 2, 0)
         stftSegments = np.expand_dims(stftSegments, 3)
         return stftSegments, stft
-
 
     def create_model(self, l2_strength=0.0):
         inputs = layers.Input(shape=[self.num_features, self.num_segments, 1])
@@ -220,7 +220,7 @@ class VoiceExtractor:
         print("Saved model to disk")
 
     def load_model(self, path):
-        self.model = keras.models.load_weights(path)
+        self.model.load_weights(path)
         print("Loaded model from disk")
 
     def filter_file(self, input_path, output_path, input_bits=16):
@@ -242,27 +242,48 @@ class VoiceExtractor:
     def graphs(self):
         loss = self.history.history['loss']
         val_loss = self.history.history['val_loss']
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(y=loss,
-                            mode='lines+markers',
-                            name='train loss'))
-        fig.add_trace(go.Scatter(y=val_loss,
-                            mode='lines+markers',
-                            name='validation loss'))
-        temp_plot = plot(fig, output_type='div')
-        return temp_plot
-        #plt.title('model loss')
-        #plt.ylabel('loss')
-        #plt.xlabel('epoch')
-        #plt.legend(['train', 'val'], loc='upper left')
-        #plt.grid()
-        #plt.show()
 
-        #plt.plot(self.history.history['accuracy'])
-        #plt.plot(self.history.history['val_accuracy'])
-        #plt.title('model accuracy')
-        #plt.ylabel('accuracy')
-        #plt.xlabel('epoch')
-        #lt.legend(['train', 'val'], loc='upper left')
-        #plt.grid()
-        #plt.show()
+        acc = self.history.history['accuracy']
+        val_acc = self.history.history['val_accuracy']
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=acc,
+                            mode='lines+markers',
+                            name='train accuracy'))
+        fig.add_trace(go.Scatter(y=val_acc,
+                            mode='lines+markers',
+                            name='validation accuracy'))
+        plocik = plot(fig, output_type='div')
+        acc_plot = Plot(None, acc, 'train accuracy', 'Epochs', 'accuracy')
+        return acc_plot.create()
+
+
+class Plot:
+    def __init__(self, x, y, title, xlabel, ylabel, ylim=None):
+        self.x = x
+        self.y = y
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.ylim = ylim
+
+    def __repr__(self):
+        return 'Formatted plot: ' + self.title
+
+    def create(self):
+        layout = Layout(paper_bgcolor='rgba(55,55,55,.1)', plot_bgcolor='rgba(36,36,36,.70)', yaxis=dict(range=self.ylim))
+        data = Scatter(x=self.x, y=self.y, name="Wykres", opacity=0.5, mode='lines+markers')
+        fig = Figure(data=data, layout=layout)
+        fig.update_layout(
+            title=self.title,
+            xaxis_title=self.xlabel,
+            yaxis_title=self.ylabel,
+            font=dict(
+                family="Courier New, monospace",
+                size=18,
+                color="white"
+            )
+        )
+        fig.update_xaxes(showgrid=True, gridwidth=.3, gridcolor="rgba(100,100,100,.80)")
+        fig.update_yaxes(showgrid=True, gridwidth=.3, gridcolor="rgba(100,100,100,.80)")
+        return plot(fig, output_type='div')

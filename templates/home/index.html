@@ -1,1 +1,16 @@
-<a href = "{% url 'upload' %}"> Upload </a>
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Extract your voice!</title>
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}"/>
+</head>
+<body>
+<div id="maintext"
+     style="position:absolute; margin:auto; width:1000px; height:500px; text-align:center; top:0; bottom: 0; left: 0; right: 0;">
+    <h1 class="text-light mb-2"> Prepare files for traning! </h1>
+    <h4 class="text-light mb-5">(In .wav format and 16 or 32 bit)</h4>
+    <a href="{% url 'upload' %}"> Upload </a>
+</div>
+</body>
+</html>

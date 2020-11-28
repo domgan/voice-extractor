@@ -1,4 +1,9 @@
-<form action="/upload/"
+{% load static %}
+<head>
+    <title>Extract your voice!</title>
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}"/>
+</head>
+<form action=""
       method="post"
       enctype="multipart/form-data"
       class="dropzone"
@@ -7,7 +12,7 @@
   <div class="fallback">
     <input name="noisy_train" type="file"/>
     <input name="clear_train" type="file"/>
-    <input type="submit" href="{% url 'filter' %}"/>
+    <input type="submit"/>
   </div>
 </form>
 <a href = "{% url 'filter' %}"> Filter </a>

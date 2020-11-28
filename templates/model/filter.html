@@ -1,5 +1,10 @@
 {% load static %}
-<form action="/filter/"
+<head>
+    <title>Extract your voice!</title>
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}"/>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+</head>
+<form action="."
       method="post"
       enctype="multipart/form-data"
       class="dropzone"
@@ -11,7 +16,8 @@
   </div>
 </form>
 
-<a href = "/output/" download> Download </a>
+
+<a href = "{% url 'download' %}" > Download </a>
 
 {% if content %}
 <table>
