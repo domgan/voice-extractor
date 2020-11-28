@@ -10,9 +10,13 @@ from django.http import HttpResponse, Http404
 import os
 import tempfile
 
+
+def home(request):
+     return render(request, 'home/index.html', {})
+
+
 def upload(request):
-    content=[]
-    figures=[]
+    figures = ''
     if request.method == 'POST':
         noisy_train = request.FILES['noisy_train'].file
         clear_train = request.FILES['clear_train'].file
@@ -20,19 +24,18 @@ def upload(request):
         model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
         #return redirect('/filter/')
-    return render(request, 'train.html', {'content':content, 'loss':figures})
+    return render(request, 'model/train.html', {'loss':figures})
 
 
 def filter(request):
     file_path = 'files/output.wav'
     if os.path.exists(file_path):
         os.remove(file_path)
-    content=[]
     if request.method == 'POST':
         noisy_file = request.FILES['noisy_file'].file
         model_weights = [np.array(weights) for weights in request.session['model_weights']]
-        filter_file(noisy_file, model_weights, request)
-    return render(request, 'filter.html', {'content':content})
+        filter_file(noisy_file, model_weights)
+    return render(request, 'model/filter.html', {})
 
 
 def create_model(noisy_train, clear_train):
@@ -46,7 +49,7 @@ def create_model(noisy_train, clear_train):
     return model_weights, figures
 
 
-def filter_file(noisy_file, model_weights, request):
+def filter_file(noisy_file, model_weights):
     voice_extractor = VoiceExtractor()
     voice_extractor.create_model()
     voice_extractor.model.set_weights(model_weights)
