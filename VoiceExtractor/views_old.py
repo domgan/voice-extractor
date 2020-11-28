@@ -11,13 +11,10 @@ from django.conf import settings
 
 
 def home(request):
-    file_path = 'media/output.wav'
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return render(request, 'home/index.html', {})
+     return render(request, 'home/index.html', {})
 
 
-def train(request):
+def upload(request):
     figures = ''
     if request.method == 'POST':
         noisy_train = request.FILES['noisy_train'].file
@@ -25,17 +22,20 @@ def train(request):
         model_weights, figures = create_model(noisy_train, clear_train)
         model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
-    # return render(request, None, {'loss': figures})
-    return HttpResponse(status=204)
+        #return redirect('/filter/')
+    return render(request, 'model/train.html', {'loss': figures})
 
 
 def filter(request):
+    file_path = 'media/output.wav'
+    if os.path.exists(file_path):
+        os.remove(file_path)
     if request.method == 'POST':
         noisy_file = request.FILES['noisy_file'].file
         model_weights = [np.array(weights) for weights in request.session['model_weights']]
         filter_file(noisy_file, model_weights)
         print('Filtered file ready.')
-    return HttpResponse(status=204)
+    return render(request, 'model/filter.html', {})
 
 
 def create_model(noisy_train, clear_train):
@@ -43,7 +43,7 @@ def create_model(noisy_train, clear_train):
     voice_extractor.load_data(noisy_train, clear_train)
     voice_extractor.create_model()
     voice_extractor.compile_model(1e-2)
-    voice_extractor.fit_model(steps=1330, epochs=2, validation_split=0.05)  # 1330
+    voice_extractor.fit_model(steps=1330, epochs=12, validation_split=0.05)  # 1330
     figures = voice_extractor.graphs()
     model_weights = voice_extractor.model.get_weights()
     return model_weights, figures
@@ -70,3 +70,13 @@ def download(request):
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     raise Http404
+
+# def download(request):
+#     # file_path = request.session['output_path']
+#     file_path = 'media/output.wav'
+#     if os.path.exists(file_path):
+#         with open(file_path, 'rb') as fh:
+#             response = HttpResponse(fh.read())
+#             response['Content-Disposition'] = 'inline; filename=output.wav'  # + os.path.basename(file_path)
+#             return response
+#     raise Http404
