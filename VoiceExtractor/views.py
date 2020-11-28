@@ -11,9 +11,8 @@ from django.conf import settings
 
 
 def home(request):
-    file_path = 'media/output.wav'
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    if not os.path.exists('media'):
+        os.mkdir('media')
     return render(request, 'home/index.html', {})
 
 
@@ -50,6 +49,9 @@ def create_model(noisy_train, clear_train):
 
 
 def filter_file(noisy_file, model_weights):
+    file_path = 'media/output.wav'
+    if os.path.exists(file_path):
+        os.remove(file_path)
     voice_extractor = VoiceExtractor()
     voice_extractor.create_model()
     voice_extractor.model.set_weights(model_weights)
