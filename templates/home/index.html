@@ -47,7 +47,7 @@
                   {% csrf_token %}
                   <input name="noisy_train" type="file"/><br>
                   <input name="clear_train" type="file"/><br><br>
-                  <input type="submit" class="button small"/>
+                  <input type="submit" class="button small" value="Train"/>
               </form>
               {% autoescape off %}
               {{ loss }}
@@ -55,7 +55,7 @@
           </div>
     </section>
 
-    <!-- Three -->
+    <!-- Filter -->
     <section id="filter" class="wrapper style3 fullscreen fade-up">
         <div class="inner">
             <h2>Filter File</h2>
@@ -68,7 +68,7 @@
                     {% csrf_token %}
                     <div class="fallback">
                       <input name="noisy_file" type="file"/>
-                      <input type="submit"/>
+                      <input type="submit" value="Filter" class="button small"/>
                     </div>
                   </form>
                     <form action="{% url 'download' %}" method="get">

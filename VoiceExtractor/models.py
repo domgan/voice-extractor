@@ -11,8 +11,7 @@ from tensorflow.keras import layers, regularizers, Model, metrics, losses, Seque
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
-
-class VoiceExtractor:
+class VoiceExtractor():
     def __init__(self, fs=16e3, win_len=256, num_segments=8*2, bits=16):
         self.fs = int(fs)
         self.bits = bits

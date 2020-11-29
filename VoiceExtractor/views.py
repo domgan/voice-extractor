@@ -38,6 +38,20 @@ def filter(request):
     return HttpResponse(status=204)
 
 
+def download(request):
+    if request.method == 'GET':
+        unique_filename = request.session['unique_filename']
+        file_path = os.path.join(settings.MEDIA_ROOT, unique_filename + '.wav')
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                filedata = fh.read()
+                response = HttpResponse(filedata, content_type='application/force-download')
+                response['Content-Disposition'] = 'inline; filename=output.wav'
+            os.remove(file_path)
+            return response
+        raise Http404
+
+
 def create_model(noisy_train, clear_train):
     voice_extractor = VoiceExtractor()
     voice_extractor.load_data(noisy_train, clear_train)
@@ -62,17 +76,3 @@ def filter_file(noisy_file, model_weights):
     # request.session['output_path'] = output_path
     voice_extractor.filter_file(noisy_file, file_path)
     return unique_filename
-
-
-def download(request):
-    if request.method == 'GET':
-        unique_filename = request.session['unique_filename']
-        file_path = os.path.join(settings.MEDIA_ROOT, unique_filename + '.wav')
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                filedata = fh.read()
-                response = HttpResponse(filedata, content_type='application/force-download')
-                response['Content-Disposition'] = 'inline; filename=output.wav'
-                os.remove(file_path)
-                return response
-        raise Http404
