@@ -4,7 +4,7 @@ from .forms import UploadFileForm
 
 import numpy as np
 from .models import VoiceExtractor
-import tempfile
+import uuid
 from django.http import HttpResponse, Http404
 import os
 from django.conf import settings
@@ -32,8 +32,9 @@ def filter(request):
     if request.method == 'POST':
         noisy_file = request.FILES['noisy_file'].file
         model_weights = [np.array(weights) for weights in request.session['model_weights']]
-        filter_file(noisy_file, model_weights)
+        unique_filename = filter_file(noisy_file, model_weights)
         print('Filtered file ready.')
+        request.session['unique_filename'] = unique_filename
     return HttpResponse(status=204)
 
 
@@ -49,7 +50,8 @@ def create_model(noisy_train, clear_train):
 
 
 def filter_file(noisy_file, model_weights):
-    file_path = 'media/output.wav'
+    unique_filename = str(uuid.uuid4().hex)
+    file_path = 'media/{}.wav'.format(unique_filename)
     if os.path.exists(file_path):
         os.remove(file_path)
     voice_extractor = VoiceExtractor()
@@ -58,17 +60,19 @@ def filter_file(noisy_file, model_weights):
     # _, temp_file_path = tempfile.mkstemp(suffix='.wav')
     # output_path = 'files/' + os.path.basename(temp_file_path)
     # request.session['output_path'] = output_path
-    output_path = 'media/output.wav'
-    voice_extractor.filter_file(noisy_file, output_path)
+    voice_extractor.filter_file(noisy_file, file_path)
+    return unique_filename
 
 
 def download(request):
-    path = 'output.wav'
-    file_path = os.path.join(settings.MEDIA_ROOT, path)
-    print('dupa', file_path)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type='application/force-download')
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-            return response
-    raise Http404
+    if request.method == 'GET':
+        unique_filename = request.session['unique_filename']
+        file_path = os.path.join(settings.MEDIA_ROOT, unique_filename + '.wav')
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                filedata = fh.read()
+                response = HttpResponse(filedata, content_type='application/force-download')
+                response['Content-Disposition'] = 'inline; filename=output.wav'
+                os.remove(file_path)
+                return response
+        raise Http404
