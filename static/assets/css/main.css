@@ -1445,19 +1445,19 @@ input, select, textarea {
 
 				.row.gtr-0 {
 					margin-top: 0;
-					margin-left: 0em;
+					margin-left: 0;
 				}
 
 					.row.gtr-0 > * {
-						padding: 0 0 0 0em;
+						padding: 0 0 0 0;
 					}
 
 					.row.gtr-0.gtr-uniform {
-						margin-top: 0em;
+						margin-top: 0;
 					}
 
 						.row.gtr-0.gtr-uniform > * {
-							padding-top: 0em;
+							padding-top: 0;
 						}
 
 				.row.gtr-25 {
@@ -1690,11 +1690,11 @@ input, select, textarea {
 
 				.row.gtr-0 {
 					margin-top: 0;
-					margin-left: 0em;
+					margin-left: 0;
 				}
 
 					.row.gtr-0 > * {
-						padding: 0 0 0 0em;
+						padding: 0 0 0 0;
 					}
 
 					.row.gtr-0.gtr-uniform {
@@ -1827,8 +1827,7 @@ input, select, textarea {
 		-webkit-transition: border-color 0.2s ease;
 		transition: border-color 0.2s ease;
 		background-color: transparent;
-		border: solid 1px !important;
-		border-color: rgba(255, 255, 255, 0.15) !important;
+		border: 1px solid rgba(255, 255, 255, 0.15) !important;
 		border-radius: 3em;
 		color: #ffffff !important;
 		cursor: pointer;
@@ -3576,13 +3575,10 @@ input, select, textarea {
 			display: -webkit-flex;
 			display: -ms-flex;
 			display: flex;
-			-moz-flex-direction: column;
 			-webkit-flex-direction: column;
 			-ms-flex-direction: column;
 			flex-direction: column;
-			-moz-justify-content: center;
 			-webkit-justify-content: center;
-			-ms-justify-content: center;
 			justify-content: center;
 			-moz-transform: translateY(0);
 			-webkit-transform: translateY(0);
@@ -3590,7 +3586,6 @@ input, select, textarea {
 			transform: translateY(0);
 			-moz-transition: opacity 1s ease;
 			-webkit-transition: opacity 1s ease;
-			-ms-transition: opacity 1s ease;
 			transition: opacity 1s ease;
 			min-height: 100%;
 			opacity: 1;
@@ -3613,7 +3608,6 @@ input, select, textarea {
 				transform: translateY(0);
 				-moz-transition: opacity 0.15s ease, -moz-transform 0.75s ease;
 				-webkit-transition: opacity 0.15s ease, -webkit-transform 0.75s ease;
-				-ms-transition: opacity 0.15s ease, -ms-transform 0.75s ease;
 				transition: opacity 0.15s ease, transform 0.75s ease;
 				margin: 1.5em 0 0 0;
 				opacity: 1;
@@ -3628,147 +3622,126 @@ input, select, textarea {
 				#sidebar nav > ul > li:nth-child(1) {
 					-moz-transition-delay: 0.45s;
 					-webkit-transition-delay: 0.45s;
-					-ms-transition-delay: 0.45s;
 					transition-delay: 0.45s;
 				}
 
 				#sidebar nav > ul > li:nth-child(2) {
 					-moz-transition-delay: 0.65s;
 					-webkit-transition-delay: 0.65s;
-					-ms-transition-delay: 0.65s;
 					transition-delay: 0.65s;
 				}
 
 				#sidebar nav > ul > li:nth-child(3) {
 					-moz-transition-delay: 0.85s;
 					-webkit-transition-delay: 0.85s;
-					-ms-transition-delay: 0.85s;
 					transition-delay: 0.85s;
 				}
 
 				#sidebar nav > ul > li:nth-child(4) {
 					-moz-transition-delay: 1.05s;
 					-webkit-transition-delay: 1.05s;
-					-ms-transition-delay: 1.05s;
 					transition-delay: 1.05s;
 				}
 
 				#sidebar nav > ul > li:nth-child(5) {
 					-moz-transition-delay: 1.25s;
 					-webkit-transition-delay: 1.25s;
-					-ms-transition-delay: 1.25s;
 					transition-delay: 1.25s;
 				}
 
 				#sidebar nav > ul > li:nth-child(6) {
 					-moz-transition-delay: 1.45s;
 					-webkit-transition-delay: 1.45s;
-					-ms-transition-delay: 1.45s;
 					transition-delay: 1.45s;
 				}
 
 				#sidebar nav > ul > li:nth-child(7) {
 					-moz-transition-delay: 1.65s;
 					-webkit-transition-delay: 1.65s;
-					-ms-transition-delay: 1.65s;
 					transition-delay: 1.65s;
 				}
 
 				#sidebar nav > ul > li:nth-child(8) {
 					-moz-transition-delay: 1.85s;
 					-webkit-transition-delay: 1.85s;
-					-ms-transition-delay: 1.85s;
 					transition-delay: 1.85s;
 				}
 
 				#sidebar nav > ul > li:nth-child(9) {
 					-moz-transition-delay: 2.05s;
 					-webkit-transition-delay: 2.05s;
-					-ms-transition-delay: 2.05s;
 					transition-delay: 2.05s;
 				}
 
 				#sidebar nav > ul > li:nth-child(10) {
 					-moz-transition-delay: 2.25s;
 					-webkit-transition-delay: 2.25s;
-					-ms-transition-delay: 2.25s;
 					transition-delay: 2.25s;
 				}
 
 				#sidebar nav > ul > li:nth-child(11) {
 					-moz-transition-delay: 2.45s;
 					-webkit-transition-delay: 2.45s;
-					-ms-transition-delay: 2.45s;
 					transition-delay: 2.45s;
 				}
 
 				#sidebar nav > ul > li:nth-child(12) {
 					-moz-transition-delay: 2.65s;
 					-webkit-transition-delay: 2.65s;
-					-ms-transition-delay: 2.65s;
 					transition-delay: 2.65s;
 				}
 
 				#sidebar nav > ul > li:nth-child(13) {
 					-moz-transition-delay: 2.85s;
 					-webkit-transition-delay: 2.85s;
-					-ms-transition-delay: 2.85s;
 					transition-delay: 2.85s;
 				}
 
 				#sidebar nav > ul > li:nth-child(14) {
 					-moz-transition-delay: 3.05s;
 					-webkit-transition-delay: 3.05s;
-					-ms-transition-delay: 3.05s;
 					transition-delay: 3.05s;
 				}
 
 				#sidebar nav > ul > li:nth-child(15) {
 					-moz-transition-delay: 3.25s;
 					-webkit-transition-delay: 3.25s;
-					-ms-transition-delay: 3.25s;
 					transition-delay: 3.25s;
 				}
 
 				#sidebar nav > ul > li:nth-child(16) {
 					-moz-transition-delay: 3.45s;
 					-webkit-transition-delay: 3.45s;
-					-ms-transition-delay: 3.45s;
 					transition-delay: 3.45s;
 				}
 
 				#sidebar nav > ul > li:nth-child(17) {
 					-moz-transition-delay: 3.65s;
 					-webkit-transition-delay: 3.65s;
-					-ms-transition-delay: 3.65s;
 					transition-delay: 3.65s;
 				}
 
 				#sidebar nav > ul > li:nth-child(18) {
 					-moz-transition-delay: 3.85s;
 					-webkit-transition-delay: 3.85s;
-					-ms-transition-delay: 3.85s;
 					transition-delay: 3.85s;
 				}
 
 				#sidebar nav > ul > li:nth-child(19) {
 					-moz-transition-delay: 4.05s;
 					-webkit-transition-delay: 4.05s;
-					-ms-transition-delay: 4.05s;
 					transition-delay: 4.05s;
 				}
 
 				#sidebar nav > ul > li:nth-child(20) {
 					-moz-transition-delay: 4.25s;
 					-webkit-transition-delay: 4.25s;
-					-ms-transition-delay: 4.25s;
 					transition-delay: 4.25s;
 				}
 
 		#sidebar nav a {
 			-moz-transition: color 0.2s ease;
 			-webkit-transition: color 0.2s ease;
-			-ms-transition: color 0.2s ease;
 			transition: color 0.2s ease;
 			border: 0;
 			color: rgba(255, 255, 255, 0.35);
@@ -3805,7 +3778,6 @@ input, select, textarea {
 				background-image: linear-gradient(to right, #426fa6, #1a1653);
 				-moz-transition: max-width 0.2s ease;
 				-webkit-transition: max-width 0.2s ease;
-				-ms-transition: max-width 0.2s ease;
 				transition: max-width 0.2s ease;
 				max-width: 0;
 			}
@@ -3848,13 +3820,9 @@ input, select, textarea {
 			}
 
 				#sidebar > .inner {
-					-moz-flex-direction: row;
 					-webkit-flex-direction: row;
 					-ms-flex-direction: row;
 					flex-direction: row;
-					-moz-align-items: -moz-stretch;
-					-webkit-align-items: -webkit-stretch;
-					-ms-align-items: -ms-stretch;
 					align-items: stretch;
 					height: inherit;
 					line-height: inherit;
