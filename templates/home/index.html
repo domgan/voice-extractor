@@ -50,7 +50,7 @@
                   <input type="submit" class="button small" value="Train"/>
               </form>
               {% autoescape off %}
-              {{ loss }}
+              {{ plot }}
               {% endautoescape %}
           </div>
     </section>
@@ -72,7 +72,7 @@
                     </div>
                   </form>
                     <form action="{% url 'download' %}" method="get">
-                        <input type="submit" value="Download"/>
+                        <br><input type="submit" value="Download"/>
                     </form>
                 </section>
             </div>

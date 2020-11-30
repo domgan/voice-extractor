@@ -3,44 +3,78 @@ from django.shortcuts import render, redirect
 from .forms import UploadFileForm
 
 import numpy as np
-from .models import VoiceExtractor
+from VoiceExtractor.filter import VoiceExtractor
 import uuid
 from django.http import HttpResponse, Http404
 import os
 from django.conf import settings
+from shutil import rmtree
 
 
 def home(request):
-    if not os.path.exists('media'):
-        os.mkdir('media')
+    media_path = 'media'
+    if not os.path.exists(media_path):
+        os.mkdir(media_path)
+    else:
+        rmtree(media_path, ignore_errors=True)
+        os.mkdir(media_path)
+
+    try:
+        del request.session['model_weights']
+        del request.session['unique_filename']
+        del request.FILES['noisy_train']
+        del request.FILES['clear_train']
+        del request.FILES['noisy_file']
+    except KeyError:
+        pass
     return render(request, 'home/index.html', {})
 
 
 def train(request):
-    figures = ''
     if request.method == 'POST':
-        noisy_train = request.FILES['noisy_train'].file
-        clear_train = request.FILES['clear_train'].file
-        model_weights, figures = create_model(noisy_train, clear_train)
+        try:
+            noisy_train = request.FILES['noisy_train'].file
+            clear_train = request.FILES['clear_train'].file
+        except KeyError:
+            print('First provide files for training!')
+            return HttpResponse(status=204)
+        try:
+            model_weights, plot = create_model(noisy_train, clear_train)
+        except ValueError:
+            print('Length of files do not match!')
+            return HttpResponse(status=204)
         model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
-    # return render(request, None, {'loss': figures})
+    # return render(request, 'home/index.html', {'plot': plot}, status=204)
     return HttpResponse(status=204)
 
 
 def filter(request):
     if request.method == 'POST':
-        noisy_file = request.FILES['noisy_file'].file
-        model_weights = [np.array(weights) for weights in request.session['model_weights']]
+        try:
+            noisy_file = request.FILES['noisy_file'].file
+        except KeyError:
+            print('First upload file for filtering!')
+            return HttpResponse(status=204)
+        try:
+            model_weights = [np.array(weights) for weights in request.session['model_weights']]
+        except KeyError:
+            print('Model not trained!')
+            return HttpResponse(status=204)
         unique_filename = filter_file(noisy_file, model_weights)
         print('Filtered file ready.')
         request.session['unique_filename'] = unique_filename
+    # return render(request, 'home/index.html', {}, status=204)
     return HttpResponse(status=204)
 
 
 def download(request):
     if request.method == 'GET':
-        unique_filename = request.session['unique_filename']
+        try:
+            unique_filename = request.session['unique_filename']
+        except KeyError:
+            print('File not filtered!')
+            return HttpResponse(status=204)
         file_path = os.path.join(settings.MEDIA_ROOT, unique_filename + '.wav')
         if os.path.exists(file_path):
             with open(file_path, 'rb') as fh:
@@ -49,7 +83,8 @@ def download(request):
                 response['Content-Disposition'] = 'inline; filename=output.wav'
             os.remove(file_path)
             return response
-        raise Http404
+        print('Filter another file!')
+        # raise Http404
 
 
 def create_model(noisy_train, clear_train):
@@ -58,9 +93,9 @@ def create_model(noisy_train, clear_train):
     voice_extractor.create_model()
     voice_extractor.compile_model(1e-2)
     voice_extractor.fit_model(steps=1330, epochs=2, validation_split=0.05)  # 1330
-    figures = voice_extractor.graphs()
+    plot = voice_extractor.graphs()
     model_weights = voice_extractor.model.get_weights()
-    return model_weights, figures
+    return model_weights, plot
 
 
 def filter_file(noisy_file, model_weights):
