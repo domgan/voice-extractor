@@ -1,19 +1,7 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE HTML>
-
-<html lang="en">
-<head>
-    <title>VoiceExtractor</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}"/>
-    <noscript>
-        <link rel="stylesheet" href="{% static 'assets/css/noscript.css' %}"/>
-    </noscript>
-</head>
-<body class="is-preload">
-
+{%  block content %}
 <!-- Sidebar -->
 <section id="sidebar">
     <div class="inner">
@@ -33,7 +21,7 @@
     <!-- Intro -->
     <section id="intro" class="wrapper style1 fullscreen fade-up">
         <div class="inner">
-            <h1> Prepare files for training. </h1>
+            <h1> Prepare audio files for training. </h1>
             <h4>(In .wav format and 16 or 32 bit)</h4>
             <!-- <ul><li><a href="#train" class="button">Upload</a></li></ul> -->
         </div>
@@ -43,12 +31,24 @@
     <section id="train" class="wrapper style2 fullscreen spotlights">
           <div class="inner">
               <h2>Train a model for your problem.</h2>
-              <form action="{% url 'train' %}" method="post" enctype="multipart/form-data">
+
+              <form action="{% url 'train' %}" method="POST" enctype="multipart/form-data">
                   {% csrf_token %}
-                  <input name="noisy_train" type="file"/><br>
-                  <input name="clear_train" type="file"/><br><br>
-                  <input type="submit" class="button small" value="Train"/>
+                  <h5>Provide sample of your voice</h5>
+                  <input name="noisy_train" type="file" onchange="loader1();"/><br><br>
+                  <h5>Provide sample of noise</h5>
+                  <input name="clear_train" type="file" onchange="loader1();"/><br><br>
+                  <input type="submit" class="button small" value="Train" onclick="loader2();" id="loader3"/>
               </form>
+
+                <br><div id="loader1">
+                    Please wait for training to end.
+                </div>
+{#                <div id="spinner" class="not-visible">#}
+{#                <div class="spinner-border" role="status">#}
+{#                    <span class="sr-only">Loading...</span>#}
+{#                </div></div>#}
+
               {% autoescape off %}
               {{ plot }}
               {% endautoescape %}
@@ -68,37 +68,26 @@
                     {% csrf_token %}
                     <div class="fallback">
                       <input name="noisy_file" type="file"/>
-                      <input type="submit" value="Filter" class="button small"/>
+                      <input type="submit" value="Filter" class="button small" onclick="loader3();"/>
                     </div>
+
                   </form>
+                     <div id="loader2">
+                        You can download filtered audio file.
+                    </div>
                     <form action="{% url 'download' %}" method="get">
                         <br><input type="submit" value="Download"/>
+                    </form>
+                </section>
+                <section>
+                    <br><br>
+                    <form action="{% url 'plots' %}">
+                        <input type="submit" class="button" value="Check model performance"/>
                     </form>
                 </section>
             </div>
         </div>
     </section>
-
 </div>
 
-<!-- Footer -->
-<footer id="footer" class="wrapper style1-alt">
-    <div class="inner">
-        <ul class="menu">
-            <li>&copy; VoiceExtractor. Żadne prawa nie są zastrzeżone.</li>
-            <li>Projekt: <a href="https://github.com/domgan">Dominik</a></li>
-        </ul>
-    </div>
-</footer>
-
-<!-- Scripts -->
-<script src="{% static 'assets/js/jquery.min.js' %}"></script>
-<script src="{% static 'assets/js/jquery.scrollex.min.js' %}"></script>
-<script src="{% static 'assets/js/jquery.scrolly.min.js' %}"></script>
-<script src="{% static 'assets/js/browser.min.js' %}"></script>
-<script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
-<script src="{% static 'assets/js/util.js' %}"></script>
-<script src="{% static 'assets/js/main.js' %}"></script>
-
-</body>
-</html>
+{% endblock content %}

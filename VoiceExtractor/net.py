@@ -5,7 +5,6 @@ import numpy as np
 from scipy import signal
 from tensorflow import keras
 from tensorflow.keras import layers, regularizers, Model
-from VoiceExtractor.plot import Plot
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
@@ -31,16 +30,28 @@ class VoiceExtractor:
 
     def _load_file(self, path):  # path to a file or IO_Bytes object
         sample_rate, data = wavfile.read(path)  # 0.140625
-        data = data.sum(axis=1) / 2
-        data = data / (2 ** (16 - 1))
+        if len(data.shape) > 1:
+            data = data.sum(axis=1) / 2  # mono-ing
+        data = data / (2 ** (16 - 1))  # normalizing
         number_of_samples = round(len(data) * float(self.fs) / sample_rate)
         data = resample(data, number_of_samples)
         return np.float32(data)
 
     def load_data(self, train_path, target_path):  # loads and slices data
         print('Loading data...')
-        self.train_data = self._load_file(train_path)
-        self.target_data = self._load_file(target_path)
+        train_data = self._load_file(train_path)
+        target_data = self._load_file(target_path)
+
+        # making signals the same length
+        train_len = len(train_data)
+        test_len = len(target_data)
+        if train_len > test_len:
+            train_data = train_data[:test_len]
+        else:
+            target_data = target_data[:train_len]
+
+        self.train_data = train_data
+        self.target_data = target_data
         print(' Done')
 
     def _stft_seg(self):
@@ -105,89 +116,89 @@ class VoiceExtractor:
         stftSegments = np.expand_dims(stftSegments, 3)
         return stftSegments, stft
 
-    def create_model(self, l2_strength=0.0):
+    def create_model(self, filters=16, l2_strength=0.0):
         inputs = layers.Input(shape=[self.num_features, self.num_segments, 1])
         x = inputs
 
         # -----
         x = layers.ZeroPadding2D(((4, 4), (0, 0)))(x)
-        x = layers.Conv2D(filters=18, kernel_size=[9, self.num_segments], strides=[1, 10], padding='valid',
+        x = layers.Conv2D(filters=filters, kernel_size=[9, self.num_segments], strides=[1, 10], padding='valid',
                           use_bias=False, kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        skip0 = layers.Conv2D(filters=30, kernel_size=[5, 1], strides=[1, 10], padding='same', use_bias=False,
+        skip0 = layers.Conv2D(filters=filters*2, kernel_size=[5, 1], strides=[1, 10], padding='same', use_bias=False,
                        kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(skip0)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=8, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters/2, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
         # -----
-        x = layers.Conv2D(filters=18, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
         #
-        skip1 = layers.Conv2D(filters=30, kernel_size=[5, 1], strides=[1, 10], padding='same', use_bias=False,
+        skip1 = layers.Conv2D(filters=filters*2, kernel_size=[5, 1], strides=[1, 10], padding='same', use_bias=False,
                        kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(skip1)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=8, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters/2, kernel_size=[9, 1], strides=[1, 10], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
         # ----
-        x = layers.Conv2D(filters=18, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=30, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters*2, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=8, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters/2, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
         # ----
-        x = layers.Conv2D(filters=18, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=30, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters*2, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
                    kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = x + skip1
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=8, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters/2, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                           kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
         # ----
-        x = layers.Conv2D(filters=18, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                           kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=30, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters*2, kernel_size=[5, 1], strides=[1, 100], padding='same', use_bias=False,
                           kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = x + skip0
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
 
-        x = layers.Conv2D(filters=8, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
+        x = layers.Conv2D(filters=filters/2, kernel_size=[9, 1], strides=[1, 100], padding='same', use_bias=False,
                           kernel_regularizer=regularizers.l2(l2_strength))(x)
         x = layers.Activation('relu')(x)
         x = layers.BatchNormalization()(x)
@@ -199,7 +210,7 @@ class VoiceExtractor:
 
         self.model = Model(inputs=inputs, outputs=x)
 
-    def compile_model(self, lr=3e-4):
+    def compile_model(self, lr=1e-3):
         # loss=losses.Huber()
         loss='binary_crossentropy'
         # loss='mse'
@@ -207,11 +218,11 @@ class VoiceExtractor:
         # metric = metrics.RootMeanSquaredError()
         self.model.compile(optimizer=keras.optimizers.Adam(lr), loss=loss, metrics=[metric])  # rmse
 
-    def fit_model(self, steps=100, epochs=5, batch_size=None, validation_split=None):
+    def fit_model(self, epochs=30, batch_size=None, validation_split=0.1):
         input_data = self._stft_seg()
         target_data = self._stft_targ()
-        self.history = self.model.fit(input_data, target_data, steps_per_epoch=steps, epochs=epochs, shuffle=True,
-                                        batch_size=batch_size, validation_split=validation_split)
+        self.history = self.model.fit(input_data, target_data, epochs=epochs, shuffle=True,
+                                      batch_size=batch_size, validation_split=validation_split)
 
     def save_model(self, path):
         self.model.save_weights(path)
@@ -228,7 +239,7 @@ class VoiceExtractor:
 
         results = self.model.predict(stft_seg)
         results = np.squeeze(results)
-        results = results.T
+        results = results.round().T
 
         # print(np.amin(results), np.amax(results))
 
@@ -237,20 +248,21 @@ class VoiceExtractor:
         invert = librosa.istft(stft3, win_length=self.win_len, hop_length=self.overlap, window=self.window, center=True)
         wavfile.write(output_path, self.fs, invert)
 
-    def graphs(self):
-        loss = self.history.history['loss']
-        val_loss = self.history.history['val_loss']
-
-        acc = self.history.history['accuracy']
-        val_acc = self.history.history['val_accuracy']
-
-        # fig = go.Figure()
-        # fig.add_trace(go.Scatter(y=acc,
-        #                     mode='lines+markers',
-        #                     name='train accuracy'))
-        # fig.add_trace(go.Scatter(y=val_acc,
-        #                     mode='lines+markers',
-        #                     name='validation accuracy'))
-        # plocik = plot(fig, output_type='div')
-        acc_plot = Plot(None, acc, 'train accuracy', 'Epochs', 'accuracy')
-        return acc_plot.create()
+    # def training_data(self):
+    #     loss = self.history.history['loss']
+    #     val_loss = self.history.history['val_loss']
+    #
+    #     acc = self.history.history['accuracy']
+    #     val_acc = self.history.history['val_accuracy']
+    #
+    #     # fig = go.Figure()
+    #     # fig.add_trace(go.Scatter(y=acc,
+    #     #                     mode='lines+markers',
+    #     #                     name='train accuracy'))
+    #     # fig.add_trace(go.Scatter(y=val_acc,
+    #     #                     mode='lines+markers',
+    #     #                     name='validation accuracy'))
+    #     # plocik = plot(fig, output_type='div')
+    #     # acc_plot = Plot(None, acc, 'train accuracy', 'Epochs', 'accuracy')
+    #     # return acc_plot.create()
+    #     return loss, val_loss, acc, val_acc

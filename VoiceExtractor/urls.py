@@ -18,7 +18,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import home, train, filter, download
+from .views import home, train, filter, download, plots
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +26,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('train/', train, name='train'),
     path('filter/', filter, name='filter'),
-    path('download/', download, name='download')
+    path('download/', download, name='download'),
+
+    path('plots/', plots, name='plots')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

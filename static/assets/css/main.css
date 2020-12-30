@@ -1,5 +1,28 @@
 @import url(fontawesome-all.min.css);
 
+
+#loader1 {
+	display: none;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+    /*background: url('http://i.stack.imgur.com/FhHRx.gif') no-repeat;*/
+    cursor: wait;
+    }
+
+#loader2 {
+	width: 100%;
+	display: none;
+    }
+
+#loader3 {
+	display: none;
+    }
+
+.not-visible {
+	display: none;
+}
+
 html, body, div, span, applet, object,
 iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
 pre, a, abbr, acronym, address, big, cite,

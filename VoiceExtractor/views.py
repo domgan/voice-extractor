@@ -3,13 +3,13 @@ from django.shortcuts import render, redirect
 from .forms import UploadFileForm
 
 import numpy as np
-from VoiceExtractor.filter import VoiceExtractor
+from VoiceExtractor.net import VoiceExtractor
 import uuid
 from django.http import HttpResponse, Http404
 import os
 from django.conf import settings
 from shutil import rmtree
-
+from VoiceExtractor.plot import Plot
 
 def home(request):
     media_path = 'media'
@@ -25,6 +25,7 @@ def home(request):
         del request.FILES['noisy_train']
         del request.FILES['clear_train']
         del request.FILES['noisy_file']
+        del request.session['history']
     except KeyError:
         pass
     return render(request, 'home/index.html', {})
@@ -39,10 +40,11 @@ def train(request):
             print('First provide files for training!')
             return HttpResponse(status=204)
         try:
-            model_weights, plot = create_model(noisy_train, clear_train)
+            model_weights, history = create_model(noisy_train, clear_train)
         except ValueError:
             print('Length of files do not match!')
             return HttpResponse(status=204)
+        request.session['history'] = history
         model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
     # return render(request, 'home/index.html', {'plot': plot}, status=204)
@@ -90,12 +92,12 @@ def download(request):
 def create_model(noisy_train, clear_train):
     voice_extractor = VoiceExtractor()
     voice_extractor.load_data(noisy_train, clear_train)
-    voice_extractor.create_model()
+    voice_extractor.create_model(8)
     voice_extractor.compile_model(1e-2)
-    voice_extractor.fit_model(steps=1330, epochs=2, validation_split=0.05)  # 1330
-    plot = voice_extractor.graphs()
+    voice_extractor.fit_model(epochs=20, validation_split=0.1)  # 1330
+    history = voice_extractor.history.history
     model_weights = voice_extractor.model.get_weights()
-    return model_weights, plot
+    return model_weights, history
 
 
 def filter_file(noisy_file, model_weights):
@@ -104,10 +106,31 @@ def filter_file(noisy_file, model_weights):
     if os.path.exists(file_path):
         os.remove(file_path)
     voice_extractor = VoiceExtractor()
-    voice_extractor.create_model()
+    voice_extractor.create_model(8)
     voice_extractor.model.set_weights(model_weights)
     # _, temp_file_path = tempfile.mkstemp(suffix='.wav')
     # output_path = 'files/' + os.path.basename(temp_file_path)
     # request.session['output_path'] = output_path
     voice_extractor.filter_file(noisy_file, file_path)
     return unique_filename
+
+
+def plots(request):
+    try:
+        history = request.session['history']
+    except KeyError:
+        info = 'First train your model!'
+        return render(request, 'home/plots.html', {'info': info})
+
+    loss = history['loss']
+    val_loss = history['val_loss']
+    acc = history['accuracy']
+    val_acc = history['val_accuracy']
+
+    loss_plot = Plot(None, loss, 'train loss', 'Epochs', 'binary_crossentropy').create()
+    val_loss_plot = Plot(None, val_loss, 'validation loss', 'Epochs', 'binary_crossentropy', color='yellow').create()
+    acc_plot = Plot(None, acc, 'train accuracy', 'Epochs', 'accuracy', color='green').create()
+    val_acc_plot = Plot(None, val_acc, 'validation accuracy', 'Epochs', 'accuracy', color='orange').create()
+
+    return render(request, 'home/plots.html', {'loss_plot': loss_plot, 'val_loss_plot': val_loss_plot,
+                                               'acc_plot': acc_plot, 'val_acc_plot': val_acc_plot})

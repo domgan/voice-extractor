@@ -1,10 +1,39 @@
-/*
-	Hyperspace by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
+let ctr = 0;
+function loader1(){
+	ctr++;
+	console.log(ctr);
+	if (ctr === 2) {
+		$("#loader3").show();
+	}
+}
+
+function loader2(){
+		$("#loader1").show();
+		$("#content1").hide();
+}
+
+function loader3(){
+		$("#loader2").show();
+		$("#content2").hide();
+}
 
 (function($) {
+	// const spinner = document.getElementById('spinner')
+	// $.ajax({
+	// 	type: 'POST',
+	// 	url: 'train/',
+	// 	success: function(response) {
+	// 		spinner.classList.remove('not-visible')
+	// 		console.log(response)
+	// 	},
+	// 	error: function(error) {
+	// 		console.log(error)
+	// 	},
+	// 	complete: function() {
+	// 		spinner.classList.add('not-visible')
+	// 	}
+	// })
+
 
 	var	$window = $(window),
 		$body = $('body'),
@@ -18,10 +47,6 @@
 			small:    [ '481px',   '736px'  ],
 			xsmall:   [ null,      '480px'  ]
 		});
-
-	// Hack: Enable IE flexbox workarounds.
-		if (browser.name == 'ie')
-			$body.addClass('is-ie');
 
 	// Play initial animations on page load.
 		$window.on('load', function() {
