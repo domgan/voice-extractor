@@ -1,56 +1,56 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{%  block content %}
+{% block content %}
 
-{% if info is None %}
-    <a href="{% url 'home' %}" style="margin-left: 1em">Go back</a>
-    <section class="wrapper style1 fullscreen fade-up">
-        <h1 style="margin-left: 2em">Loss functions:</h1><br>
-        <div class="split style2">
-            <section>
-                <div style="margin-left: 8em;">
-                {% autoescape off %}
-                {{ loss_plot }}
-                {% endautoescape %}
-                </div>
-            </section>
-            <section>
-            <div style="margin-left: 4em;">
-            {% autoescape off %}
-            {{ val_loss_plot }}
-            {% endautoescape %}
+    {% if info is None %}
+        <a href="{% url 'home' %}" style="margin-left: 1em">Go back</a>
+        <section class="wrapper style1 fullscreen fade-up">
+            <h1 style="margin-left: 2em">Loss functions:</h1><br>
+            <div class="split style2">
+                <section>
+                    <div style="margin-left: 8em;">
+                        {% autoescape off %}
+                            {{ loss_plot }}
+                        {% endautoescape %}
+                    </div>
+                </section>
+                <section>
+                    <div style="margin-left: 4em;">
+                        {% autoescape off %}
+                            {{ val_loss_plot }}
+                        {% endautoescape %}
+                    </div>
+                </section>
             </div>
-            </section>
-        </div>
-    </section>
-    <section class="wrapper style3 fullscreen fade-up">
-        <h1 style="margin-left: 2em">Accuracy functions:</h1><br>
-        <div class="split style2">
-            <section>
-            <div style="margin-left: 8em;">
-            {% autoescape off %}
-            {{ acc_plot }}
-            {% endautoescape %}
+        </section>
+        <section class="wrapper style3 fullscreen fade-up">
+            <h1 style="margin-left: 2em">Accuracy functions:</h1><br>
+            <div class="split style2">
+                <section>
+                    <div style="margin-left: 8em;">
+                        {% autoescape off %}
+                            {{ acc_plot }}
+                        {% endautoescape %}
+                    </div>
+                </section>
+                <section>
+                    <div style="margin-left: 4em;">
+                        {% autoescape off %}
+                            {{ val_acc_plot }}
+                        {% endautoescape %}
+                    </div>
+                </section>
             </div>
-            </section>
-            <section>
-            <div style="margin-left: 4em;">
-            {% autoescape off %}
-            {{ val_acc_plot }}
-            {% endautoescape %}
+        </section>
+    {% else %}
+        <section id="train" class="wrapper style2 fullscreen spotlights">
+            <div class="inner2">
+                <h1>{{ info }}</h1>
+                <a href="{% url 'home' %}">Go back</a>
             </div>
-            </section>
-    </div>
-    </section>
-{% else %}
-    <section id="train" class="wrapper style2 fullscreen spotlights">
-        <div class="inner2">
-            <h1>{{ info }}</h1>
-            <a href="{% url 'home' %}">Go back</a>
-        </div>
-    </section>
-{% endif %}
+        </section>
+    {% endif %}
 
 
 {% endblock content %}

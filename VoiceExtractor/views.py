@@ -12,7 +12,6 @@ from VoiceExtractor.plot import Plot
 
 def home(request):
     media_path = 'media'
-    print(request.method)
     if not os.path.exists(media_path):
         os.mkdir(media_path)
     else:
