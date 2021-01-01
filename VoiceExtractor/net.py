@@ -240,11 +240,8 @@ class VoiceExtractor:
         results = self.model.predict(stft_seg)
         results = np.squeeze(results)
         results = results.round().T
-
         # print(np.amin(results), np.amax(results))
-
         stft3 = np.multiply(stft, results)
-
         invert = librosa.istft(stft3, win_length=self.win_len, hop_length=self.overlap, window=self.window, center=True)
         wavfile.write(output_path, self.fs, invert)
 

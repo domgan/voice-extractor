@@ -1,215 +1,198 @@
 let ctr = 0;
-function loader1(){
-	ctr++;
-	console.log(ctr);
-	if (ctr === 2) {
-		$("#loader3").show();
-	}
+
+function loader1() {
+    ctr++;
+    console.log(ctr);
+    if (ctr === 2) {
+        $("#loader3").show();
+    }
 }
 
-function loader2(){
-		$("#loader1").show();
-		$("#content1").hide();
+function loader2() {
+    $("#loader1").show();
+    $("#content1").hide();
 }
 
-function loader3(){
-		$("#loader2").show();
-		$("#content2").hide();
+function loader3() {
+    $("#loader2").show();
+    $("#content2").hide();
 }
 
-(function($) {
-	// const spinner = document.getElementById('spinner')
-	// $.ajax({
-	// 	type: 'POST',
-	// 	url: 'train/',
-	// 	success: function(response) {
-	// 		spinner.classList.remove('not-visible')
-	// 		console.log(response)
-	// 	},
-	// 	error: function(error) {
-	// 		console.log(error)
-	// 	},
-	// 	complete: function() {
-	// 		spinner.classList.add('not-visible')
-	// 	}
-	// })
+(function ($) {
+    var $window = $(window),
+        $body = $('body'),
+        $sidebar = $('#sidebar');
 
+    // Breakpoints.
+    breakpoints({
+        xlarge: ['1281px', '1680px'],
+        large: ['981px', '1280px'],
+        medium: ['737px', '980px'],
+        small: ['481px', '736px'],
+        xsmall: [null, '480px']
+    });
 
-	var	$window = $(window),
-		$body = $('body'),
-		$sidebar = $('#sidebar');
+    // Play initial animations on page load.
+    $window.on('load', function () {
+        window.setTimeout(function () {
+            $body.removeClass('is-preload');
+        }, 100);
+    });
 
-	// Breakpoints.
-		breakpoints({
-			xlarge:   [ '1281px',  '1680px' ],
-			large:    [ '981px',   '1280px' ],
-			medium:   [ '737px',   '980px'  ],
-			small:    [ '481px',   '736px'  ],
-			xsmall:   [ null,      '480px'  ]
-		});
+    // Forms.
+    // Hack: Activate non-input submits.
+    $('form').on('click', '.submit', function (event) {
 
-	// Play initial animations on page load.
-		$window.on('load', function() {
-			window.setTimeout(function() {
-				$body.removeClass('is-preload');
-			}, 100);
-		});
+        // Stop propagation, default.
+        event.stopPropagation();
+        event.preventDefault();
 
-	// Forms.
+        // Submit form.
+        $(this).parents('form').submit();
 
-		// Hack: Activate non-input submits.
-			$('form').on('click', '.submit', function(event) {
+    });
 
-				// Stop propagation, default.
-					event.stopPropagation();
-					event.preventDefault();
+    // Sidebar.
+    if ($sidebar.length > 0) {
 
-				// Submit form.
-					$(this).parents('form').submit();
+        var $sidebar_a = $sidebar.find('a');
 
-			});
+        $sidebar_a
+            .addClass('scrolly')
+            .on('click', function () {
 
-	// Sidebar.
-		if ($sidebar.length > 0) {
+                var $this = $(this);
 
-			var $sidebar_a = $sidebar.find('a');
+                // External link? Bail.
+                if ($this.attr('href').charAt(0) !== '#')
+                    return;
 
-			$sidebar_a
-				.addClass('scrolly')
-				.on('click', function() {
+                // Deactivate all links.
+                $sidebar_a.removeClass('active');
 
-					var $this = $(this);
+                // Activate link *and* lock it (so Scrollex doesn't try to activate other links as we're scrolling to this one's section).
+                $this
+                    .addClass('active')
+                    .addClass('active-locked');
 
-					// External link? Bail.
-						if ($this.attr('href').charAt(0) != '#')
-							return;
+            })
+            .each(function () {
 
-					// Deactivate all links.
-						$sidebar_a.removeClass('active');
+                var $this = $(this),
+                    id = $this.attr('href'),
+                    $section = $(id);
 
-					// Activate link *and* lock it (so Scrollex doesn't try to activate other links as we're scrolling to this one's section).
-						$this
-							.addClass('active')
-							.addClass('active-locked');
+                // No section for this link? Bail.
+                if ($section.length < 1)
+                    return;
 
-				})
-				.each(function() {
+                // Scrollex.
+                $section.scrollex({
+                    mode: 'middle',
+                    top: '-20vh',
+                    bottom: '-20vh',
+                    initialize: function () {
 
-					var	$this = $(this),
-						id = $this.attr('href'),
-						$section = $(id);
+                        // Deactivate section.
+                        $section.addClass('inactive');
 
-					// No section for this link? Bail.
-						if ($section.length < 1)
-							return;
+                    },
+                    enter: function () {
 
-					// Scrollex.
-						$section.scrollex({
-							mode: 'middle',
-							top: '-20vh',
-							bottom: '-20vh',
-							initialize: function() {
+                        // Activate section.
+                        $section.removeClass('inactive');
 
-								// Deactivate section.
-									$section.addClass('inactive');
+                        // No locked links? Deactivate all links and activate this section's one.
+                        if ($sidebar_a.filter('.active-locked').length === 0) {
 
-							},
-							enter: function() {
+                            $sidebar_a.removeClass('active');
+                            $this.addClass('active');
 
-								// Activate section.
-									$section.removeClass('inactive');
+                        }
 
-								// No locked links? Deactivate all links and activate this section's one.
-									if ($sidebar_a.filter('.active-locked').length == 0) {
+                        // Otherwise, if this section's link is the one that's locked, unlock it.
+                        else if ($this.hasClass('active-locked'))
+                            $this.removeClass('active-locked');
 
-										$sidebar_a.removeClass('active');
-										$this.addClass('active');
+                    }
+                });
 
-									}
+            });
 
-								// Otherwise, if this section's link is the one that's locked, unlock it.
-									else if ($this.hasClass('active-locked'))
-										$this.removeClass('active-locked');
+    }
 
-							}
-						});
+    // Scrolly.
+    $('.scrolly').scrolly({
+        speed: 1000,
+        offset: function () {
 
-				});
+            // If <=large, >small, and sidebar is present, use its height as the offset.
+            if (breakpoints.active('<=large')
+                && !breakpoints.active('<=small')
+                && $sidebar.length > 0)
+                return $sidebar.height();
 
-		}
+            return 0;
 
-	// Scrolly.
-		$('.scrolly').scrolly({
-			speed: 1000,
-			offset: function() {
+        }
+    });
 
-				// If <=large, >small, and sidebar is present, use its height as the offset.
-					if (breakpoints.active('<=large')
-					&&	!breakpoints.active('<=small')
-					&&	$sidebar.length > 0)
-						return $sidebar.height();
+    // Spotlights.
+    $('.spotlights > section')
+        .scrollex({
+            mode: 'middle',
+            top: '-10vh',
+            bottom: '-10vh',
+            initialize: function () {
 
-				return 0;
+                // Deactivate section.
+                $(this).addClass('inactive');
 
-			}
-		});
+            },
+            enter: function () {
 
-	// Spotlights.
-		$('.spotlights > section')
-			.scrollex({
-				mode: 'middle',
-				top: '-10vh',
-				bottom: '-10vh',
-				initialize: function() {
+                // Activate section.
+                $(this).removeClass('inactive');
 
-					// Deactivate section.
-						$(this).addClass('inactive');
+            }
+        })
+        .each(function () {
 
-				},
-				enter: function() {
+            var $this = $(this),
+                $image = $this.find('.image'),
+                $img = $image.find('img'),
+                x;
 
-					// Activate section.
-						$(this).removeClass('inactive');
+            // Assign image.
+            $image.css('background-image', 'url(' + $img.attr('src') + ')');
 
-				}
-			})
-			.each(function() {
+            // Set background position.
+            if (x === $img.data('position'))
+                $image.css('background-position', x);
 
-				var	$this = $(this),
-					$image = $this.find('.image'),
-					$img = $image.find('img'),
-					x;
+            // Hide <img>.
+            $img.hide();
 
-				// Assign image.
-					$image.css('background-image', 'url(' + $img.attr('src') + ')');
+        });
 
-				// Set background position.
-					if (x = $img.data('position'))
-						$image.css('background-position', x);
+    // Features.
+    $('.features')
+        .scrollex({
+            mode: 'middle',
+            top: '-20vh',
+            bottom: '-20vh',
+            initialize: function () {
 
-				// Hide <img>.
-					$img.hide();
+                // Deactivate section.
+                $(this).addClass('inactive');
 
-			});
+            },
+            enter: function () {
 
-	// Features.
-		$('.features')
-			.scrollex({
-				mode: 'middle',
-				top: '-20vh',
-				bottom: '-20vh',
-				initialize: function() {
+                // Activate section.
+                $(this).removeClass('inactive');
 
-					// Deactivate section.
-						$(this).addClass('inactive');
-
-				},
-				enter: function() {
-
-					// Activate section.
-						$(this).removeClass('inactive');
-
-				}
-			});
+            }
+        });
 
 })(jQuery);

@@ -1,18 +1,18 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
-from .forms import UploadFileForm
+from django.shortcuts import render
 
 import numpy as np
 from VoiceExtractor.net import VoiceExtractor
 import uuid
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 import os
 from django.conf import settings
 from shutil import rmtree
 from VoiceExtractor.plot import Plot
 
+
 def home(request):
     media_path = 'media'
+    print(request.method)
     if not os.path.exists(media_path):
         os.mkdir(media_path)
     else:
