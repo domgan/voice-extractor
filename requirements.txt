@@ -1,0 +1,6 @@
+django
+scipy
+librosa
+numpy
+tensorflow
+plotly
