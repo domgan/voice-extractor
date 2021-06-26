@@ -1,5 +1,5 @@
+import pickle
 from django.shortcuts import render
-
 import numpy as np
 from VoiceExtractor.net import VoiceExtractor
 import uuid
@@ -9,6 +9,8 @@ from django.conf import settings
 from shutil import rmtree
 from VoiceExtractor.plot import Plot
 
+neurons = 16
+
 
 def home(request):
     media_path = 'media'
@@ -17,7 +19,6 @@ def home(request):
     else:
         rmtree(media_path, ignore_errors=True)
         os.mkdir(media_path)
-
     try:
         del request.session['model_weights']
         del request.session['unique_filename']
@@ -31,20 +32,32 @@ def home(request):
 
 
 def train(request):
+    loaded = False
     if request.method == 'POST':
         try:
             noisy_train = request.FILES['noisy_train'].file
             clear_train = request.FILES['clear_train'].file
         except KeyError:
             print('First provide files for training!')
-            return HttpResponse(status=204)
-        try:
-            model_weights, history = create_model(noisy_train, clear_train)
-        except ValueError:
-            print('Length of files do not match!')
-            return HttpResponse(status=204)
+            noisy_train, clear_train = None, None
+        if not noisy_train or not clear_train:
+            try:
+                modelfile = request.FILES['weights'].file
+                model_weights = pickle.load(modelfile)
+                history = 'Model loaded'
+                loaded = True
+            except KeyError:
+                print('Upload model!')
+                return HttpResponse(status=204)
+        else:
+            try:
+                model_weights, history = create_model(noisy_train, clear_train)
+            except ValueError:
+                print('Length of files do not match!')
+                return HttpResponse(status=204)
         request.session['history'] = history
-        model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
+        if not loaded:
+            model_weights = [weights.tolist() for weights in model_weights]  # change list of ndarrays to list of list for json serialization
         request.session['model_weights'] = model_weights
     # return render(request, 'home/index.html', {'plot': plot}, status=204)
     return HttpResponse(status=204)
@@ -88,11 +101,41 @@ def download(request):
         # raise Http404
 
 
+def load(request):
+    if request.method == 'POST':
+        try:
+            file = request.FILES['weights'].file
+            with open(file, 'rb') as f:
+                model_weights = pickle.load(f)
+        except KeyError:
+            return HttpResponse(status=204)
+        return model_weights
+    return HttpResponse(status=204)
+
+
+def save(request):
+    unique_modelname = str(uuid.uuid4().hex)
+    if request.method == 'GET':
+        try:
+            model_weights = request.session['model_weights']
+        except KeyError:
+            print('First train your model!')
+            return HttpResponse(status=204)
+        with open(unique_modelname, 'wb') as f:
+            pickle.dump(model_weights, f, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(unique_modelname, 'rb') as f:
+            modelfile = f.read()
+        response = HttpResponse(modelfile, content_type='application/force-download')
+        response['Content-Disposition'] = 'inline; filename=your.model'
+        os.remove(unique_modelname)
+        return response
+
+
 def create_model(noisy_train, clear_train):
     voice_extractor = VoiceExtractor()
     voice_extractor.load_data(noisy_train, clear_train)
-    voice_extractor.create_model(8)
-    voice_extractor.compile_model(1e-2)
+    voice_extractor.create_model(neurons)
+    voice_extractor.compile_model(1e-3)
     voice_extractor.fit_model(epochs=20, validation_split=0.1)  # 1330
     history = voice_extractor.history.history
     model_weights = voice_extractor.model.get_weights()
@@ -105,7 +148,7 @@ def filter_file(noisy_file, model_weights):
     if os.path.exists(file_path):
         os.remove(file_path)
     voice_extractor = VoiceExtractor()
-    voice_extractor.create_model(8)
+    voice_extractor.create_model(neurons)
     voice_extractor.model.set_weights(model_weights)
     # _, temp_file_path = tempfile.mkstemp(suffix='.wav')
     # output_path = 'files/' + os.path.basename(temp_file_path)

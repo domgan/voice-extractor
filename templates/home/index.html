@@ -30,21 +30,33 @@
         <section id="train" class="wrapper style2 fullscreen spotlights">
             <div class="inner">
                 <h2>Train a model for your problem.</h2>
-
-                <form action="{% url 'train' %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <h5>Provide sample of your voice</h5>
-                    <input name="noisy_train" type="file" onchange="loader1();"/><br><br>
-                    <h5>Provide sample of noise</h5>
-                    <input name="clear_train" type="file" onchange="loader1();"/><br><br>
-                    <input type="submit" class="button small" value="Train" onclick="loader2();" id="loader3"/>
-                </form>
-
-                <br>
-                <div id="loader1">
-                    Please wait for training to end.
+                <div class="split style1">
+                        <section>
+                            <form action="{% url 'train' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h5>Provide sample of your voice</h5>
+                                <input name="noisy_train" type="file" onchange="loader1();"/><br><br>
+                                <h5>Provide sample of noise</h5>
+                                <input name="clear_train" type="file" onchange="loader1();"/><br><br>
+                                <h5>Or upload previously created model</h5>
+                                <input type="file" value="Load model" onchange="loader4();" name="weights"/><br><br>
+                                <input type="submit" class="button small" value="Done" onclick="loader2();" id="loader3"/>
+                            </form>
+                            <br>
+                            <div id="loader1">
+                                Please wait for training to end.
+                            </div>
+                        </section>
+                    <section>
+                        <form action="{% url 'save' %}" method="get">
+                            <input type="submit" value="Save model"/>
+                        </form>
+                        <br>
+                        <form action="{% url 'plots' %}">
+                            <input type="submit" class="button" value="Check model performance"/>
+                        </form>
+                    </section>
                 </div>
-
                 {% autoescape off %}
                     {{ plot }}
                 {% endautoescape %}
@@ -56,32 +68,24 @@
             <div class="inner">
                 <h2>Filter File</h2>
                 <p>Provide file to extract voice from.</p>
-                <div class="split style1">
-                    <section>
-                        <form action="{% url 'filter' %}"
-                              method="post"
-                              enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="fallback">
-                                <input name="noisy_file" type="file"/>
-                                <input type="submit" value="Filter" class="button small" onclick="loader3();"/>
-                            </div>
 
-                        </form>
-                        <div id="loader2">
-                            You can download filtered audio file.
-                        </div>
-                        <form action="{% url 'download' %}" method="get">
-                            <br><input type="submit" value="Download"/>
-                        </form>
-                    </section>
-                    <section>
-                        <br><br>
-                        <form action="{% url 'plots' %}">
-                            <input type="submit" class="button" value="Check model performance"/>
-                        </form>
-                    </section>
+                <form action="{% url 'filter' %}"
+                      method="post"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="fallback">
+                        <input name="noisy_file" type="file"/>
+                        <input type="submit" value="Filter" class="button small" onclick="loader3();"/>
+                    </div>
+                </form>
+                <div id="loader2">
+                    You can download filtered audio file.
                 </div>
+                <form action="{% url 'download' %}" method="get">
+                    <br><input type="submit" value="Download"/>
+                </form>
+
+
             </div>
         </section>
     </div>

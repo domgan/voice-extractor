@@ -212,7 +212,7 @@ class VoiceExtractor:
 
     def compile_model(self, lr=1e-3):
         # loss=losses.Huber()
-        loss='binary_crossentropy'
+        loss = 'binary_crossentropy'
         # loss='mse'
         metric = 'accuracy'
         # metric = metrics.RootMeanSquaredError()

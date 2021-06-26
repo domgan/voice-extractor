@@ -8,8 +8,17 @@ function loader1() {
     }
 }
 
+function loader4() {
+    ctr++;
+    console.log(ctr);
+    if (ctr === 1) {
+        $("#loader3").show();
+    }
+}
+
 function loader2() {
     $("#loader1").show();
+    $("#loader4").show();
     $("#content1").hide();
 }
 
