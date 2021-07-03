@@ -39,16 +39,19 @@ class VoiceExtractor:
 
     def load_data(self, train_path, target_path):  # loads and slices data
         print('Loading data...')
-        train_data = self._load_file(train_path)
-        target_data = self._load_file(target_path)
+        voice = self._load_file(train_path)
+        noise = self._load_file(target_path)
 
         # making signals the same length
-        train_len = len(train_data)
-        test_len = len(target_data)
+        train_len = len(voice)
+        test_len = len(noise)
         if train_len > test_len:
-            train_data = train_data[:test_len]
+            voice = voice[:test_len]
         else:
-            target_data = target_data[:train_len]
+            noise = noise[:train_len]
+
+        train_data = voice + noise
+        target_data = voice
 
         self.train_data = train_data
         self.target_data = target_data

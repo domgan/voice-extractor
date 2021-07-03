@@ -9,7 +9,7 @@ from django.conf import settings
 from shutil import rmtree
 from VoiceExtractor.plot import Plot
 
-neurons = 16
+neurons = 32
 
 
 def home(request):
@@ -136,7 +136,7 @@ def create_model(noisy_train, clear_train):
     voice_extractor.load_data(noisy_train, clear_train)
     voice_extractor.create_model(neurons)
     voice_extractor.compile_model(1e-3)
-    voice_extractor.fit_model(epochs=20, validation_split=0.1)  # 1330
+    voice_extractor.fit_model(epochs=40, validation_split=0.1)  # 1330
     history = voice_extractor.history.history
     model_weights = voice_extractor.model.get_weights()
     return model_weights, history
@@ -163,7 +163,9 @@ def plots(request):
     except KeyError:
         info = 'First train your model!'
         return render(request, 'home/plots.html', {'info': info})
-
+    if type(history) is str:
+        info = 'Model was loaded. No history plots!'
+        return render(request, 'home/plots.html', {'info': info})
     loss = history['loss']
     val_loss = history['val_loss']
     acc = history['accuracy']
